@@ -1,0 +1,35 @@
+[20-Jun-2024 11:46:25 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home2/simpl391/public_html/Visitacao/db.php:6
+Stack trace:
+#0 /home2/simpl391/public_html/Visitacao/db.php(6): mysqli_connect('localhost', 'root', Object(SensitiveParameterValue), 'visitacao')
+#1 /home2/simpl391/public_html/Visitacao/index.php(7): include('/home2/simpl391...')
+#2 {main}
+  thrown in /home2/simpl391/public_html/Visitacao/db.php on line 6
+[20-Jun-2024 11:46:53 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home2/simpl391/public_html/Visitacao/db.php:6
+Stack trace:
+#0 /home2/simpl391/public_html/Visitacao/db.php(6): mysqli_connect('localhost', 'root', Object(SensitiveParameterValue), 'visitacao')
+#1 /home2/simpl391/public_html/Visitacao/index.php(7): include('/home2/simpl391...')
+#2 {main}
+  thrown in /home2/simpl391/public_html/Visitacao/db.php on line 6
+[20-Jun-2024 11:47:07 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home2/simpl391/public_html/Visitacao/db.php:6
+Stack trace:
+#0 /home2/simpl391/public_html/Visitacao/db.php(6): mysqli_connect('localhost', 'root', Object(SensitiveParameterValue), 'visitacao')
+#1 /home2/simpl391/public_html/Visitacao/index.php(7): include('/home2/simpl391...')
+#2 {main}
+  thrown in /home2/simpl391/public_html/Visitacao/db.php on line 6
+[20-Jun-2024 11:47:21 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home2/simpl391/public_html/Visitacao/db.php:6
+Stack trace:
+#0 /home2/simpl391/public_html/Visitacao/db.php(6): mysqli_connect('localhost', 'root', Object(SensitiveParameterValue), 'visitacao')
+#1 /home2/simpl391/public_html/Visitacao/index.php(7): include('/home2/simpl391...')
+#2 {main}
+  thrown in /home2/simpl391/public_html/Visitacao/db.php on line 6
+[20-Jun-2024 11:47:25 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home2/simpl391/public_html/Visitacao/db.php:6
+Stack trace:
+#0 /home2/simpl391/public_html/Visitacao/db.php(6): mysqli_connect('localhost', 'root', Object(SensitiveParameterValue), 'visitacao')
+#1 /home2/simpl391/public_html/Visitacao/index.php(7): include('/home2/simpl391...')
+#2 {main}
+  thrown in /home2/simpl391/public_html/Visitacao/db.php on line 6
+[20-Jun-2024 15:03:06 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'ciclo' in 'field list' in /home2/simpl391/public_html/Visitacao/view_forms.php:18
+Stack trace:
+#0 /home2/simpl391/public_html/Visitacao/view_forms.php(18): mysqli->prepare('SELECT id, nome...')
+#1 {main}
+  thrown in /home2/simpl391/public_html/Visitacao/view_forms.php on line 18
