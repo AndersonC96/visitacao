@@ -68,8 +68,8 @@
                                     <input type="text" class="form-control" id="numero_registro" name="numero_registro" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="numero_registro" class="form-label"><b>Conselho</b></label>
-                                    <input type="text" class="form-control" id="numero_registro" name="nome_conselho" required>
+                                    <label for="nome_conselho" class="form-label"><b>Conselho</b></label>
+                                    <input type="text" class="form-control" id="nome_conselho" name="nome_conselho" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="profissao" class="form-label"><b>Especialidade</b></label>
@@ -169,22 +169,43 @@
             $(document).ready(function(){
                 $('#telefone').mask('(00) 0000-0000');
                 $('#celular').mask('(00) 00000-0000');
-            });
-            function getQueryParams(){
-                var params = {};
-                window.location.search.substring(1).split("&").forEach(function(pair){
-                    pair = pair.split("=");
-                    params[pair[0]] = decodeURIComponent(pair[1] || "");
+                $('#nome').on('blur', function(){
+                    var nome = $(this).val();
+                    if(nome){
+                        $.ajax({
+                            url: 'get_user_info.php',
+                            type: 'GET',
+                            data: { nome: nome },
+                            success: function(data){
+                                var userInfo = JSON.parse(data);
+                                if(userInfo){
+                                    $('#numero_registro').val(userInfo.numero_registro);
+                                    $('#nome_conselho').val(userInfo.nome_conselho);
+                                    $('#profissao').val(userInfo.profissao);
+                                    $('#endereco').val(userInfo.endereco);
+                                    $('#cidade').val(userInfo.cidade);
+                                    $('#estado').val(userInfo.estado);
+                                }
+                            }
+                        });
+                    }
                 });
-                return params;
-            }
-            $(document).ready(function(){
-                var params = getQueryParams();
-                if(params.success === "true"){
-                    alert("Formulário enviado com sucesso!");
-                }else if(params.success === "false"){
-                    alert("Ocorreu um erro ao enviar o formulário: " + params.error);
+                function getQueryParams(){
+                    var params = {};
+                    window.location.search.substring(1).split("&").forEach(function(pair){
+                        pair = pair.split("=");
+                        params[pair[0]] = decodeURIComponent(pair[1] || "");
+                    });
+                    return params;
                 }
+                $(document).ready(function(){
+                    var params = getQueryParams();
+                    if(params.success === "true"){
+                        alert("Formulário enviado com sucesso!");
+                    }else if(params.success === "false"){
+                        alert("Ocorreu um erro ao enviar o formulário: " + params.error);
+                    }
+                });
             });
         </script>
     </body>
