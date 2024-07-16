@@ -14,8 +14,17 @@
     if($user = $result->fetch_assoc()){
         $_SESSION['user_type'] = $user['is_admin'] ? 'admin' : 'user';
     }
-    $sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms";
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $results_per_page = 10;
+    $offset = ($page - 1) * $results_per_page;
+    $total_sql = "SELECT COUNT(*) AS total FROM forms";
+    $total_result = $conn->query($total_sql);
+    $total_row = $total_result->fetch_assoc();
+    $total_records = $total_row['total'];
+    $total_pages = ceil($total_records / $results_per_page);
+    $sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms LIMIT ?, ?";
     $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $offset, $results_per_page);
     $stmt->execute();
     $result = $stmt->get_result();
 ?>
@@ -90,6 +99,17 @@
                 text-overflow: ellipsis;
                 vertical-align: middle;
             }
+            .pagination .page-item.active .page-link {
+                background-color: #3ea5af;
+                border-color: #3ea5af;
+                color: #ffffff;
+            }
+            .pagination .page-link {
+                color: #3ea5af;
+            }
+            .pagination .page-link:hover {
+                color: #007bff;
+            }
         </style>
     </head>
     <body>
@@ -111,60 +131,84 @@
             </div>
         </nav>
         <div class="container mt-4">
-            <h2>Cadastros Realizados</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <!--<th>ID</th>-->
-                        <th>Nome</th>
-                        <th>Nº de Registro</th>
-                        <th>Conselho</th>
-                        <th>Especialidade</th>
-                        <th>Endereço</th>
-                        <th>Cidade</th>
-                        <th>Estado</th>
-                        <th>Tipo da visita</th>
-                        <th>Ciclo</th>
-                        <th>Observações</th>
-                        <th>Data/Hora</th>
-                        <th>Representante</th>
-                        <?php if($user['is_admin']) { ?>
-                        <th>Editar</th>
-                        <th>Remover</th>
-                        <?php } ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if($result->num_rows > 0): ?>
-                    <?php while($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['nome']) ?></td>
-                        <td><?= htmlspecialchars($row['numero_registro']) ?></td>
-                        <td><?= htmlspecialchars($row['nome_conselho']) ?></td>
-                        <td><?= htmlspecialchars($row['profissao']) ?></td>
-                        <td><?= htmlspecialchars($row['endereco']) ?></td>
-                        <td><?= htmlspecialchars($row['cidade']) ?></td>
-                        <td><?= htmlspecialchars($row['estado']) ?></td>
-                        <td><?= htmlspecialchars($row['visita']) ?></td>
-                        <td><?= htmlspecialchars($row['ciclo']) ?></td>
-                        <td>
-                            <span class="truncate" data-bs-toggle="tooltip" title="<?= htmlspecialchars($row['observacao']) ?>">
-                                <?= htmlspecialchars($row['observacao']) ?>
-                            </span>
-                        </td>
-                        <td><?= date('d/m/Y H:i', strtotime($row['data_hora'])) ?></td>
-                        <td><?= htmlspecialchars($row['representante']) ?></td>
-                        <?php if($user['is_admin']) { ?>
-                        <td><a href="edit_form.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">Editar</a></td>
-                        <td><a href="remove_form.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este cadastro?')">Remover</a></td>
-                        <?php } ?>
-                    </tr>
-                    <?php endwhile; ?>
-                    <?php else: ?>
-                    <tr><td colspan="11">Nenhum cadastro encontrado.</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+            <h2 class="text-center">Cadastros Realizados</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mx-auto">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Nº de Registro</th>
+                            <th>Conselho</th>
+                            <th>Especialidade</th>
+                            <th>Endereço</th>
+                            <th>Cidade</th>
+                            <th>Estado</th>
+                            <th>Tipo da visita</th>
+                            <th>Ciclo</th>
+                            <th>Observações</th>
+                            <th>Data/Hora</th>
+                            <th>Representante</th>
+                            <?php if($user['is_admin']) { ?>
+                            <th>Editar</th>
+                            <th>Remover</th>
+                            <?php } ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if($result->num_rows > 0): ?>
+                        <?php while($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['nome']) ?></td>
+                            <td><?= htmlspecialchars($row['numero_registro']) ?></td>
+                            <td><?= htmlspecialchars($row['nome_conselho']) ?></td>
+                            <td><?= htmlspecialchars($row['profissao']) ?></td>
+                            <td><?= htmlspecialchars($row['endereco']) ?></td>
+                            <td><?= htmlspecialchars($row['cidade']) ?></td>
+                            <td><?= htmlspecialchars($row['estado']) ?></td>
+                            <td><?= htmlspecialchars($row['visita']) ?></td>
+                            <td><?= htmlspecialchars($row['ciclo']) ?></td>
+                            <td>
+                                <span class="truncate" data-bs-toggle="tooltip" title="<?= htmlspecialchars($row['observacao']) ?>">
+                                    <?= htmlspecialchars($row['observacao']) ?>
+                                </span>
+                            </td>
+                            <td><?= date('d/m/Y H:i', strtotime($row['data_hora'])) ?></td>
+                            <td><?= htmlspecialchars($row['representante']) ?></td>
+                            <?php if($user['is_admin']) { ?>
+                            <td><a href="edit_form.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">Editar</a></td>
+                            <td><a href="remove_form.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este cadastro?')">Remover</a></td>
+                            <?php } ?>
+                        </tr>
+                        <?php endwhile; ?>
+                        <?php else: ?>
+                        <tr><td colspan="11">Nenhum cadastro encontrado.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <?php if($page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+                        <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                        <?php endfor; ?>
+                        <?php if($page < $total_pages): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
+            </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
