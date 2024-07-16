@@ -17,14 +17,26 @@
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $results_per_page = 10;
     $offset = ($page - 1) * $results_per_page;
-    $total_sql = "SELECT COUNT(*) AS total FROM forms";
-    $total_result = $conn->query($total_sql);
+    if($_SESSION['user_type'] == 'admin'){
+        $total_sql = "SELECT COUNT(*) AS total FROM forms";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms LIMIT ?, ?";
+        $stmt = $conn->prepare($forms_sql);
+        $stmt->bind_param("ii", $offset, $results_per_page);
+    }else{
+        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ?";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? LIMIT ?, ?";
+        $stmt = $conn->prepare($forms_sql);
+        $stmt->bind_param("iii", $user_id, $offset, $results_per_page);
+    }
+    $total_stmt = $conn->prepare($total_sql);
+    if($_SESSION['user_type'] != 'admin'){
+        $total_stmt->bind_param("i", $user_id);
+    }
+    $total_stmt->execute();
+    $total_result = $total_stmt->get_result();
     $total_row = $total_result->fetch_assoc();
     $total_records = $total_row['total'];
     $total_pages = ceil($total_records / $results_per_page);
-    $sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms LIMIT ?, ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $offset, $results_per_page);
     $stmt->execute();
     $result = $stmt->get_result();
 ?>
@@ -148,7 +160,7 @@
                             <th>Observações</th>
                             <th>Data/Hora</th>
                             <th>Representante</th>
-                            <?php if($user['is_admin']) { ?>
+                            <?php if($_SESSION['user_type'] == 'admin') { ?>
                             <th>Editar</th>
                             <th>Remover</th>
                             <?php } ?>
@@ -174,7 +186,7 @@
                             </td>
                             <td><?= date('d/m/Y H:i', strtotime($row['data_hora'])) ?></td>
                             <td><?= htmlspecialchars($row['representante']) ?></td>
-                            <?php if($user['is_admin']) { ?>
+                            <?php if($_SESSION['user_type'] == 'admin') { ?>
                             <td><a href="edit_form.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">Editar</a></td>
                             <td><a href="remove_form.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este cadastro?')">Remover</a></td>
                             <?php } ?>
