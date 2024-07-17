@@ -1,5 +1,17 @@
 <?php
+    session_start();
+    if(!isset($_SESSION['user_id'])){
+        header("Location: index.php");
+        exit();
+    }
     include 'db.php';
+
+    if($_SESSION['is_admin'] == 0) 
+    { 
+        header("Location: index.php");            
+        exit();
+    }
+
     require 'vendor/autoload.php';
     use PhpOffice\PhpSpreadsheet\Spreadsheet;
     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -23,13 +35,14 @@
         $data_fim = isset($_POST['data_fim']) ? $_POST['data_fim'] : null;
         $sql = "SELECT * FROM forms";
         if($data_inicio && $data_fim){
-            $sql .= " WHERE data_hora BETWEEN '$data_inicio' AND '$data_fim'";
+            $sql .= " WHERE data_hora BETWEEN '$data_inicio 00:00:01' AND '$data_fim 23:59:59'";
         }elseif ($data_inicio){
-            $sql .= " WHERE data_hora >= '$data_inicio'";
+            $sql .= " WHERE data_hora >= '$data_inicio 00:00:01'";
         }elseif ($data_fim){
-            $sql .= " WHERE data_hora <= '$data_fim'";
+            $sql .= " WHERE data_hora <= '$data_fim 23:59:59'";
         }
         $result = mysqli_query($conn, $sql);
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'Nome');
