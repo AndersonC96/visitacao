@@ -149,17 +149,22 @@
                     <thead>
                         <tr>
                             <th>Nome</th>
-                            <th>Nº de Registro</th>
+                            <!--<th>Nº de Registro</th>-->
+                            <th>Reg.</th>
                             <th>Conselho</th>
                             <th>Especialidade</th>
                             <th>Endereço</th>
                             <th>Cidade</th>
-                            <th>Estado</th>
-                            <th>Tipo da visita</th>
+                            <!--<th>Estado</th>-->
+                            <th>UF</th>
+                            <!--<th>Tipo da visita</th>-->
+                            <th>TP. visita</th>
                             <th>Ciclo</th>
                             <th>Observações</th>
-                            <th>Data/Hora</th>
-                            <th>Representante</th>
+                            <!--<th>Data/Hora</th>-->
+                            <th>Data</th>
+                            <!--<th>Representante</th>-->
+                            <th>Rep.</th>
                             <?php if($_SESSION['user_type'] == 'admin') { ?>
                             <th>Editar</th>
                             <th>Remover</th>
