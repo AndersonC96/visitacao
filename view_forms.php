@@ -184,7 +184,8 @@
                                     <?= htmlspecialchars($row['observacao']) ?>
                                 </span>
                             </td>
-                            <td><?= date('d/m/Y H:i', strtotime($row['data_hora'])) ?></td>
+                            <!--<td><?= date('d/m/Y H:i', strtotime($row['data_hora'])) ?></td>-->
+                            <td><?= date('d/m/y', strtotime($row['data_hora'])) ?></td>
                             <td><?= htmlspecialchars($row['representante']) ?></td>
                             <?php if($_SESSION['user_type'] == 'admin') { ?>
                             <td><a href="edit_form.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">Editar</a></td>
