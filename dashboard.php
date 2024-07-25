@@ -48,10 +48,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="view_forms.php"><i class="fas fa-eye"></i> Ver Formulários</a>
                         </li>
+                        <?php if($user['is_admin']) { ?>
                         <li class="nav-item">
                             <a class="nav-link" href="export.php"><i class="fas fa-file-export"></i> Exportar</a>
                         </li>
-                        <?php if($user['is_admin']) { ?>
                         <li class="nav-item">
                             <a class="nav-link" href="create_user.php"><i class="fas fa-user-plus"></i> Criar Usuário</a>
                         </li>
