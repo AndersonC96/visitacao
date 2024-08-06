@@ -5,20 +5,20 @@
         exit();
     }
     include 'db.php';
-
-    if($_SESSION['is_admin'] == 0) 
-    { 
-        header("Location: index.php");            
+    if($_SESSION['is_admin'] == 0){
+        header("Location: index.php");
         exit();
     }
-
     require 'vendor/autoload.php';
     use PhpOffice\PhpSpreadsheet\Spreadsheet;
     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-    /*function formatPhoneNumber($phoneNumber){
-        $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
-        return preg_replace('/^(\d{2})(\d{5})(\d{4})$/', '($1) $2-$3', $phoneNumber);
-    }*/
+    use PhpOffice\PhpSpreadsheet\Chart\Chart;
+    use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+    use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+    use PhpOffice\PhpSpreadsheet\Chart\Legend;
+    use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+    use PhpOffice\PhpSpreadsheet\Chart\Title;
+    use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet as PhpSpreadsheetWorksheet;
     function formatPhoneNumber($phoneNumber){
         $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
         if(strlen($phoneNumber) == 10){
@@ -36,13 +36,12 @@
         $sql = "SELECT * FROM forms";
         if($data_inicio && $data_fim){
             $sql .= " WHERE data_hora BETWEEN '$data_inicio 00:00:01' AND '$data_fim 23:59:59'";
-        }elseif ($data_inicio){
+        }elseif($data_inicio){
             $sql .= " WHERE data_hora >= '$data_inicio 00:00:01'";
-        }elseif ($data_fim){
+        }elseif($data_fim){
             $sql .= " WHERE data_hora <= '$data_fim 23:59:59'";
         }
         $result = mysqli_query($conn, $sql);
-
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'Nome');
@@ -86,9 +85,7 @@
         $row = 2;
         while($row_data = mysqli_fetch_assoc($result)){
             $sheet->setCellValue('A' . $row, $row_data['nome']);
-            //$sheet->setCellValue('B' . $row, formatPhoneNumber($row_data['numero_registro']));
             $sheet->setCellValueExplicit('B' . $row, $row_data['numero_registro'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            //$sheet->setCellValue('C' . $row, formatPhoneNumber($row_data['nome_conselho']));
             $sheet->setCellValue('C' . $row, $row_data['nome_conselho']);
             $sheet->setCellValue('D' . $row, $row_data['profissao']);
             $sheet->setCellValue('E' . $row, $row_data['endereco']);
@@ -106,17 +103,68 @@
                 'fill' => [
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                     'startColor' => [
-                        'rgb' => 'F0F0F0', // Fundo cinza claro
+                        'rgb' => 'F0F0F0',
                     ],
                 ],
             ]);
             $row++;
         }
+        $chartSheet = new PhpSpreadsheetWorksheet($spreadsheet, 'Gráfico');
+        $spreadsheet->addSheet($chartSheet);
+        $chartSheet->setCellValue('A1', 'Nome do Representante');
+        $chartSheet->setCellValue('B1', 'Contagem');
+        $representativeCounts = [];
+        for($i = 2; $i < $row; $i++){
+            $representative = $sheet->getCell('L' . $i)->getValue();
+            if(!isset($representativeCounts[$representative])){
+                $representativeCounts[$representative] = 0;
+            }
+            $representativeCounts[$representative]++;
+        }
+        $chartRow = 2;
+        foreach($representativeCounts as $rep => $count){
+            $chartSheet->setCellValue('A' . $chartRow, $rep);
+            $chartSheet->setCellValue('B' . $chartRow, $count);
+            $chartRow++;
+        }
+        $dataSeriesLabels = [
+            new DataSeriesValues('String', 'Gráfico!$B$1', null, 1),
+        ];
+        $xAxisTickValues = [
+            new DataSeriesValues('String', 'Gráfico!$A$2:$A$' . ($chartRow - 1), null, 4),
+        ];
+        $dataSeriesValues = [
+            new DataSeriesValues('Number', 'Gráfico!$B$2:$B$' . ($chartRow - 1), null, 4),
+        ];
+        $series = new DataSeries(
+            DataSeries::TYPE_BARCHART,
+            DataSeries::GROUPING_STANDARD,
+            range(0, count($dataSeriesValues) - 1),
+            $dataSeriesLabels,
+            $xAxisTickValues,
+            $dataSeriesValues
+        );
+        $plotArea = new PlotArea(null, [$series]);
+        $chartTitle = new Title('Contagem de Nome do Representante');
+        $chart = new Chart(
+            'sample_chart',
+            $chartTitle,
+            new Legend(Legend::POSITION_RIGHT, null, false),
+            $plotArea,
+            true,
+            0,
+            null,
+            null
+        );
+        $chart->setTopLeftPosition('D2');
+        $chart->setBottomRightPosition('K15');
+        $chartSheet->addChart($chart);
         $filename = 'dados_' . date('d-m-Y_H-i-s') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"$filename\"");
         header('Cache-Control: max-age=0');
         $writer = new Xlsx($spreadsheet);
+        $writer->setIncludeCharts(true);
         $writer->save('php://output');
         exit();
     }
@@ -138,7 +186,7 @@
                 <a class="navbar-brand" href="#">
                     <img src="https://static.wixstatic.com/media/fef91e_c3f644e14da442178f706149ae38d838~mv2.png/v1/crop/x_0,y_24,w_436,h_262/fill/w_120,h_71,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/CAPA-03.png" alt="Logo" style="height: 50px;">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
