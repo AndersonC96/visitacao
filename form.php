@@ -137,16 +137,16 @@
                                 <div class="mb-3">
                                     <label class="form-label"><b>Brand do Ciclo</b></label><br>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="ciclo1" name="ciclo[]" value="Resvitech">
-                                        <label class="form-check-label" for="ciclo1">Resvitech</label>
+                                        <input class="form-check-input" type="checkbox" id="ciclo1" name="ciclo[]" value="Clonapure">
+                                        <label class="form-check-label" for="ciclo1">Clonapure</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="ciclo2" name="ciclo[]" value="Pepstrong">
-                                        <label class="form-check-label" for="ciclo2">Pepstrong</label>
+                                        <input class="form-check-input" type="checkbox" id="ciclo2" name="ciclo[]" value="Odilia">
+                                        <label class="form-check-label" for="ciclo2">Odilia</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="ciclo3" name="ciclo[]" value="Vinogrape">
-                                        <label class="form-check-label" for="ciclo3">Vinogrape</label>
+                                        <input class="form-check-input" type="checkbox" id="ciclo3" name="ciclo[]" value="Bioberon">
+                                        <label class="form-check-label" for="ciclo3">Bioberon</label>
                                     </div>
                                 </div>
                                 <div class="mb-3">
