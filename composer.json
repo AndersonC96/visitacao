@@ -7,6 +7,7 @@
         "fzaninotto/faker": "^1.5",
         "dompdf/dompdf": "^3.0",
         "league/csv": "^9.16",
-        "symfony/var-dumper": "^7.1"
+        "symfony/var-dumper": "^7.1",
+        "robmorgan/phinx": "^0.16.3"
     }
 }
