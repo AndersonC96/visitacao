@@ -6,6 +6,7 @@
         "phpmailer/phpmailer": "^6.9",
         "fzaninotto/faker": "^1.5",
         "dompdf/dompdf": "^3.0",
-        "league/csv": "^9.16"
+        "league/csv": "^9.16",
+        "symfony/var-dumper": "^7.1"
     }
 }
