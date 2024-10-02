@@ -1,14 +1,12 @@
 <?php
     session_start();
-    if(!isset($_SESSION['user_id'])){
+    if (!isset($_SESSION['user_id'])) {
         header("Location: index.php");
         exit();
     }
     include 'db.php';
-    if($_SESSION['is_admin'] == 0){
-        header("Location: index.php");
-        exit();
-    }
+    $is_admin = $_SESSION['is_admin'];
+    $user_id = $_SESSION['user_id'];
     require 'vendor/autoload.php';
     use PhpOffice\PhpSpreadsheet\Spreadsheet;
     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -19,27 +17,30 @@
     use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
     use PhpOffice\PhpSpreadsheet\Chart\Title;
     use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet as PhpSpreadsheetWorksheet;
-    function formatPhoneNumber($phoneNumber){
+    function formatPhoneNumber($phoneNumber) {
         $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
-        if(strlen($phoneNumber) == 10){
+        if (strlen($phoneNumber) == 10) {
             return preg_replace('/^(\d{2})(\d{4})(\d{4})$/', '($1) $2-$3', $phoneNumber);
-        }else{
+        } else {
             return preg_replace('/^(\d{2})(\d{5})(\d{4})$/', '($1) $2-$3', $phoneNumber);
         }
     }
-    function formatDateTime($dateTime){
+    function formatDateTime($dateTime) {
         return date('d/m/Y H:i', strtotime($dateTime));
     }
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $data_inicio = isset($_POST['data_inicio']) ? $_POST['data_inicio'] : null;
         $data_fim = isset($_POST['data_fim']) ? $_POST['data_fim'] : null;
         $sql = "SELECT * FROM forms";
-        if($data_inicio && $data_fim){
-            $sql .= " WHERE data_hora BETWEEN '$data_inicio 00:00:01' AND '$data_fim 23:59:59'";
-        }elseif($data_inicio){
-            $sql .= " WHERE data_hora >= '$data_inicio 00:00:01'";
-        }elseif($data_fim){
-            $sql .= " WHERE data_hora <= '$data_fim 23:59:59'";
+        if ($is_admin == 0) {
+            $sql .= " WHERE id_usr = $user_id";
+        }
+        if ($data_inicio && $data_fim) {
+            $sql .= ($is_admin == 0 ? " AND" : " WHERE") . " data_hora BETWEEN '$data_inicio 00:00:01' AND '$data_fim 23:59:59'";
+        } elseif ($data_inicio) {
+            $sql .= ($is_admin == 0 ? " AND" : " WHERE") . " data_hora >= '$data_inicio 00:00:01'";
+        } elseif ($data_fim) {
+            $sql .= ($is_admin == 0 ? " AND" : " WHERE") . " data_hora <= '$data_fim 23:59:59'";
         }
         $result = mysqli_query($conn, $sql);
         $spreadsheet = new Spreadsheet();
@@ -83,7 +84,7 @@
             ],
         ]);
         $row = 2;
-        while($row_data = mysqli_fetch_assoc($result)){
+        while ($row_data = mysqli_fetch_assoc($result)) {
             $sheet->setCellValue('A' . $row, $row_data['nome']);
             $sheet->setCellValueExplicit('B' . $row, $row_data['numero_registro'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('C' . $row, $row_data['nome_conselho']);
@@ -109,62 +110,11 @@
             ]);
             $row++;
         }
-        $chartSheet = new PhpSpreadsheetWorksheet($spreadsheet, 'Gráfico');
-        $spreadsheet->addSheet($chartSheet);
-        $chartSheet->setCellValue('A1', 'Nome do Representante');
-        $chartSheet->setCellValue('B1', 'Contagem');
-        $representativeCounts = [];
-        for($i = 2; $i < $row; $i++){
-            $representative = $sheet->getCell('L' . $i)->getValue();
-            if(!isset($representativeCounts[$representative])){
-                $representativeCounts[$representative] = 0;
-            }
-            $representativeCounts[$representative]++;
-        }
-        $chartRow = 2;
-        foreach($representativeCounts as $rep => $count){
-            $chartSheet->setCellValue('A' . $chartRow, $rep);
-            $chartSheet->setCellValue('B' . $chartRow, $count);
-            $chartRow++;
-        }
-        $dataSeriesLabels = [
-            new DataSeriesValues('String', 'Gráfico!$B$1', null, 1),
-        ];
-        $xAxisTickValues = [
-            new DataSeriesValues('String', 'Gráfico!$A$2:$A$' . ($chartRow - 1), null, 4),
-        ];
-        $dataSeriesValues = [
-            new DataSeriesValues('Number', 'Gráfico!$B$2:$B$' . ($chartRow - 1), null, 4),
-        ];
-        $series = new DataSeries(
-            DataSeries::TYPE_BARCHART,
-            DataSeries::GROUPING_STANDARD,
-            range(0, count($dataSeriesValues) - 1),
-            $dataSeriesLabels,
-            $xAxisTickValues,
-            $dataSeriesValues
-        );
-        $plotArea = new PlotArea(null, [$series]);
-        $chartTitle = new Title('Contagem de Nome do Representante');
-        $chart = new Chart(
-            'sample_chart',
-            $chartTitle,
-            new Legend(Legend::POSITION_RIGHT, null, false),
-            $plotArea,
-            true,
-            0,
-            null,
-            null
-        );
-        $chart->setTopLeftPosition('D2');
-        $chart->setBottomRightPosition('K15');
-        $chartSheet->addChart($chart);
         $filename = 'dados_' . date('d-m-Y_H-i-s') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"$filename\"");
         header('Cache-Control: max-age=0');
         $writer = new Xlsx($spreadsheet);
-        $writer->setIncludeCharts(true);
         $writer->save('php://output');
         exit();
     }
