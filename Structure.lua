@@ -47,4 +47,5 @@ visitacao/
 ├── .gitignore                  # Arquivos e pastas ignorados pelo Git
 ├── README.md                   # Documentação do projeto
 ├── composer.json               # Dependências do Composer
-└── composer.lock               # Arquivo gerado pelo Composer
+├── composer.lock               # Arquivo gerado pelo Composer
+└── index.php                   # Ponto de entrada principal
