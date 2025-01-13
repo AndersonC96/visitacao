@@ -1,3 +1,4 @@
-vendor/
+/vendor
 error_log
-old/
+/old
+structure.lua
