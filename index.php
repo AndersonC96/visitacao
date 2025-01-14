@@ -2,11 +2,11 @@
     session_start();
     // Redirecionar para o dashboard se o usuário já estiver logado
     if (isset($_SESSION['user_id'])) {
-        header("Location: dashboard.php");
+        header("Location: ./public/dashboard.php");
         exit();
     }
     // Conexão com o banco de dados
-    include 'db.php';
+    include './config/db.php';
     // Variável de erro
     $error = "";
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -33,13 +33,13 @@
                     // Prosseguir com login
                     $_SESSION['user_id'] = $row['id'];
                     $_SESSION['is_admin'] = $row['is_admin'];
-                    header("Location: dashboard.php");
+                    header("Location: ./public/dashboard.php");
                     exit();
                 } elseif (password_verify($password, $row['password'])) {
                     // Login com senha no novo padrão
                     $_SESSION['user_id'] = $row['id'];
                     $_SESSION['is_admin'] = $row['is_admin'];
-                    header("Location: dashboard.php");
+                    header("Location: ./public/dashboard.php");
                     exit();
                 } else {
                     $error = "Usuário ou senha incorretos.";
