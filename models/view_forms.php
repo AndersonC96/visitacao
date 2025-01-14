@@ -4,7 +4,7 @@
         header("Location: index.php");
         exit();
     }
-    include 'db.php';
+    include '../config/db.php';
     $user_id = $_SESSION['user_id'];
     $sql = "SELECT * FROM users WHERE id = ?";
     $stmt = $conn->prepare($sql);
