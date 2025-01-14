@@ -17,7 +17,7 @@
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $results_per_page = 10;
     $offset = ($page - 1) * $results_per_page;
-    if($_SESSION['user_type'] == 'admin'){
+    /*if($_SESSION['user_type'] == 'admin'){
         $total_sql = "SELECT COUNT(*) AS total FROM forms";
         $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms LIMIT ?, ?";
         $stmt = $conn->prepare($forms_sql);
@@ -25,6 +25,17 @@
     }else{
         $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ?";
         $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? LIMIT ?, ?";
+        $stmt = $conn->prepare($forms_sql);
+        $stmt->bind_param("iii", $user_id, $offset, $results_per_page);
+    }*/
+    if ($_SESSION['user_type'] == 'admin') {
+        $total_sql = "SELECT COUNT(*) AS total FROM forms";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms ORDER BY data_hora DESC LIMIT ?, ?";
+        $stmt = $conn->prepare($forms_sql);
+        $stmt->bind_param("ii", $offset, $results_per_page);
+    } else {
+        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ?";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? ORDER BY data_hora DESC LIMIT ?, ?";
         $stmt = $conn->prepare($forms_sql);
         $stmt->bind_param("iii", $user_id, $offset, $results_per_page);
     }
