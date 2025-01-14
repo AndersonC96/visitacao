@@ -1,69 +1,59 @@
 <?php
-session_start();
-
-// Redirecionar para o dashboard se o usuário já estiver logado
-if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
-    exit();
-}
-
-// Conexão com o banco de dados
-include 'db.php';
-
-// Variável de erro
-$error = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitizar e validar entradas
-    $username = htmlspecialchars(trim($_POST['username']));
-    $password = $_POST['password'];
-
-    // Consulta SQL para buscar o usuário
-    $sql = "SELECT * FROM users WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt) {
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows == 1) {
-            $row = $result->fetch_assoc();
-
-            // Verificar a senha com MD5 ou password_hash
-            if (md5($password) === $row['password']) {
-                // Atualizar a senha para o novo padrão com password_hash
-                $newHashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $updateSql = "UPDATE users SET password = ? WHERE id = ?";
-                $updateStmt = $conn->prepare($updateSql);
-                $updateStmt->bind_param("si", $newHashedPassword, $row['id']);
-                $updateStmt->execute();
-
-                // Prosseguir com login
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['is_admin'] = $row['is_admin'];
-                header("Location: dashboard.php");
-                exit();
-            } elseif (password_verify($password, $row['password'])) {
-                // Login com senha no novo padrão
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['is_admin'] = $row['is_admin'];
-                header("Location: dashboard.php");
-                exit();
+    session_start();
+    // Redirecionar para o dashboard se o usuário já estiver logado
+    if (isset($_SESSION['user_id'])) {
+        header("Location: dashboard.php");
+        exit();
+    }
+    // Conexão com o banco de dados
+    include 'db.php';
+    // Variável de erro
+    $error = "";
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Sanitizar e validar entradas
+        $username = htmlspecialchars(trim($_POST['username']));
+        $password = $_POST['password'];
+        // Consulta SQL para buscar o usuário
+        $sql = "SELECT * FROM users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows == 1) {
+                $row = $result->fetch_assoc();
+                // Verificar a senha com MD5 ou password_hash
+                if (md5($password) === $row['password']) {
+                    // Atualizar a senha para o novo padrão com password_hash
+                    $newHashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                    $updateSql = "UPDATE users SET password = ? WHERE id = ?";
+                    $updateStmt = $conn->prepare($updateSql);
+                    $updateStmt->bind_param("si", $newHashedPassword, $row['id']);
+                    $updateStmt->execute();
+                    // Prosseguir com login
+                    $_SESSION['user_id'] = $row['id'];
+                    $_SESSION['is_admin'] = $row['is_admin'];
+                    header("Location: dashboard.php");
+                    exit();
+                } elseif (password_verify($password, $row['password'])) {
+                    // Login com senha no novo padrão
+                    $_SESSION['user_id'] = $row['id'];
+                    $_SESSION['is_admin'] = $row['is_admin'];
+                    header("Location: dashboard.php");
+                    exit();
+                } else {
+                    $error = "Usuário ou senha incorretos.";
+                }
             } else {
                 $error = "Usuário ou senha incorretos.";
             }
         } else {
-            $error = "Usuário ou senha incorretos.";
+            // Logar erro para análise interna
+            error_log("Erro na preparação da consulta: " . $conn->error);
+            $error = "Ocorreu um erro. Tente novamente mais tarde.";
         }
-    } else {
-        // Logar erro para análise interna
-        error_log("Erro na preparação da consulta: " . $conn->error);
-        $error = "Ocorreu um erro. Tente novamente mais tarde.";
     }
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
