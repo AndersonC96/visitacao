@@ -124,24 +124,30 @@
     include '../views/templates/header.php'; // Inclui o cabeçalho
     include '../views/templates/navbar.php'; // Inclui a Navbar
 ?>
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center">Exportar para Excel</h2>
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Exportar dados para Excel</h3>
                 </div>
                 <div class="card-body">
                     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                        <div class="mb-3">
-                            <label for="data_inicio" class="form-label">Data de Início</label>
-                            <input type="date" class="form-control" id="data_inicio" name="data_inicio">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="data_inicio" class="form-label"><b>Data de Início</b></label>
+                                <input type="date" class="form-control" id="data_inicio" name="data_inicio">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="data_fim" class="form-label"><b>Data de Término</b></label>
+                                <input type="date" class="form-control" id="data_fim" name="data_fim">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="data_fim" class="form-label">Data de Término</label>
-                            <input type="date" class="form-control" id="data_fim" name="data_fim">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-file-export me-2"></i>Exportar
+                            </button>
                         </div>
-                        <button type="submit" class="btn btn-primary">Exportar</button>
                     </form>
                 </div>
             </div>
