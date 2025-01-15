@@ -120,7 +120,7 @@
     }
 ?>
 <?php
-    $title = "Formulário"; // Define o título da página
+    $title = "Exportar dados"; // Define o título da página
     include '../views/templates/header.php'; // Inclui o cabeçalho
     include '../views/templates/navbar.php'; // Inclui a Navbar
 ?>
