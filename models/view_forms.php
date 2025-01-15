@@ -1,6 +1,6 @@
 <?php
     session_start();
-    if(!isset($_SESSION['user_id'])){
+    if (!isset($_SESSION['user_id'])) {
         header("Location: index.php");
         exit();
     }
@@ -11,37 +11,33 @@
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    if($user = $result->fetch_assoc()){
+    if ($user = $result->fetch_assoc()) {
         $_SESSION['user_type'] = $user['is_admin'] ? 'admin' : 'user';
     }
+    // Obter termo de busca
+    $search_representante = $_GET['search_representante'] ?? '';
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $results_per_page = 10;
     $offset = ($page - 1) * $results_per_page;
-    /*if($_SESSION['user_type'] == 'admin'){
-        $total_sql = "SELECT COUNT(*) AS total FROM forms";
-        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms LIMIT ?, ?";
-        $stmt = $conn->prepare($forms_sql);
-        $stmt->bind_param("ii", $offset, $results_per_page);
-    }else{
-        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ?";
-        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? LIMIT ?, ?";
-        $stmt = $conn->prepare($forms_sql);
-        $stmt->bind_param("iii", $user_id, $offset, $results_per_page);
-    }*/
     if ($_SESSION['user_type'] == 'admin') {
-        $total_sql = "SELECT COUNT(*) AS total FROM forms";
-        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms ORDER BY data_hora DESC LIMIT ?, ?";
+        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE representante LIKE ?";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE representante LIKE ? ORDER BY data_hora DESC LIMIT ?, ?";
         $stmt = $conn->prepare($forms_sql);
-        $stmt->bind_param("ii", $offset, $results_per_page);
+        $search_term = '%' . $search_representante . '%';
+        $stmt->bind_param("sii", $search_term, $offset, $results_per_page);
     } else {
-        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ?";
-        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? ORDER BY data_hora DESC LIMIT ?, ?";
+        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ? AND representante LIKE ?";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? AND representante LIKE ? ORDER BY data_hora DESC LIMIT ?, ?";
         $stmt = $conn->prepare($forms_sql);
-        $stmt->bind_param("iii", $user_id, $offset, $results_per_page);
+        $search_term = '%' . $search_representante . '%';
+        $stmt->bind_param("isii", $user_id, $search_term, $offset, $results_per_page);
     }
+    // Total de registros
     $total_stmt = $conn->prepare($total_sql);
-    if($_SESSION['user_type'] != 'admin'){
-        $total_stmt->bind_param("i", $user_id);
+    if ($_SESSION['user_type'] == 'admin') {
+        $total_stmt->bind_param("s", $search_term);
+    } else {
+        $total_stmt->bind_param("is", $user_id, $search_term);
     }
     $total_stmt->execute();
     $total_result = $total_stmt->get_result();
@@ -52,12 +48,22 @@
     $result = $stmt->get_result();
 ?>
 <?php
-    $title = "Formulário"; // Define o título da página
-    include '../views/templates/header.php'; // Inclui o cabeçalho
-    include '../views/templates/navbar.php'; // Inclui a Navbar
+    $title = "Visualizar formulários";
+    include '../views/templates/header.php';
+    include '../views/templates/navbar.php';
 ?>
 <div class="container mt-4">
     <h2 class="text-center">Cadastros Realizados</h2>
+    <form method="get" class="d-flex justify-content-center mb-3">
+        <input
+            type="text"
+            name="search_representante"
+            class="form-control w-50 me-2"
+            placeholder="Buscar por Representante"
+            value="<?= htmlspecialchars($search_representante) ?>"
+        >
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover table-sm text-center justify-content">
             <thead class="table-primary">
@@ -74,15 +80,15 @@
                     <th>Observações</th>
                     <th>Data</th>
                     <th>Rep.</th>
-                    <?php if($_SESSION['user_type'] == 'admin') { ?>
+                    <?php if ($_SESSION['user_type'] == 'admin') { ?>
                         <th>Editar</th>
                         <th>Remover</th>
                     <?php } ?>
                 </tr>
             </thead>
             <tbody>
-                <?php if($result->num_rows > 0): ?>
-                    <?php while($row = $result->fetch_assoc()): ?>
+                <?php if ($result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
                         <tr>
                             <td class="justify-content"><?= htmlspecialchars($row['nome']) ?></td>
                             <td class="justify-content"><?= htmlspecialchars($row['numero_registro']) ?></td>
@@ -104,7 +110,7 @@
                             </td>
                             <td class="justify-content"><?= date('d/m/y', strtotime($row['data_hora'])) ?></td>
                             <td class="justify-content"><?= htmlspecialchars($row['representante']) ?></td>
-                            <?php if($_SESSION['user_type'] == 'admin') { ?>
+                            <?php if ($_SESSION['user_type'] == 'admin') { ?>
                                 <td>
                                     <a href="edit_form.php?id=<?= $row['id'] ?>" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-edit"></i>
@@ -128,47 +134,50 @@
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 <?php if ($page > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
-                        &laquo;
-                    </a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<?= $page - 1 ?>&search_representante=<?= htmlspecialchars($search_representante) ?>" aria-label="Previous">
+                            &laquo;
+                        </a>
+                    </li>
                 <?php endif; ?>
                 <?php
-                    $range = 2; // Define o número de páginas vizinhas
-                    $start = max(1, $page - $range);
-                    $end = min($total_pages, $page + $range);
-                    if ($start > 1): ?>
+                $range = 2;
+                $start = max(1, $page - $range);
+                $end = min($total_pages, $page + $range);
+                if ($start > 1): ?>
                     <li class="page-item">
-                        <a class="page-link" href="?page=1">1</a>
+                        <a class="page-link" href="?page=1&search_representante=<?= htmlspecialchars($search_representante) ?>">1</a>
                     </li>
                     <?php if ($start > 2): ?>
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
                     <?php endif; ?>
                 <?php endif; ?>
+
                 <?php for ($i = $start; $i <= $end; $i++): ?>
-                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-                </li>
+                    <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                        <a class="page-link" href="?page=<?= $i ?>&search_representante=<?= htmlspecialchars($search_representante) ?>"><?= $i ?></a>
+                    </li>
                 <?php endfor; ?>
+
                 <?php if ($end < $total_pages): ?>
-                <?php if ($end < $total_pages - 1): ?>
-                <li class="page-item disabled">
-                    <span class="page-link">...</span>
-                </li>
+                    <?php if ($end < $total_pages - 1): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<?= $total_pages ?>&search_representante=<?= htmlspecialchars($search_representante) ?>"><?= $total_pages ?></a>
+                    </li>
                 <?php endif; ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?= $total_pages ?>"><?= $total_pages ?></a>
-                </li>
-                <?php endif; ?>
+
                 <?php if ($page < $total_pages): ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
-                        &raquo;
-                    </a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<?= $page + 1 ?>&search_representante=<?= htmlspecialchars($search_representante) ?>" aria-label="Next">
+                            &raquo;
+                        </a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </nav>
@@ -176,16 +185,14 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 <script>
-    $(document).ready(function(){
-        $('#telefone').mask('(00) 0000-0000');
-        $('#celular').mask('(00) 00000-0000');
+    $(document).ready(function () {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl){
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
 </script>
-<?php include '../views/templates/footer.php'; // Inclui o rodapé ?>
+<?php include '../views/templates/footer.php'; ?>
