@@ -26,7 +26,7 @@
                         <i class="fas fa-user-cog"></i> Admin
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <li><a class="dropdown-item" href="create_user.php"><i class="fas fa-user-plus"></i> Criar Usuário</a></li>
+                        <li><a class="dropdown-item" href="../views/users/create_user.php"><i class="fas fa-user-plus"></i> Criar Usuário</a></li>
                         <li><a class="dropdown-item" href="view_users.php"><i class="fas fa-users"></i> Ver Usuários</a></li>
                     </ul>
                 </li>
