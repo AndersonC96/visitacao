@@ -18,7 +18,7 @@
                     <a class="nav-link" href="../models/view_forms.php"><i class="fas fa-eye"></i> Ver Formulários</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="export.php"><i class="fas fa-file-export"></i> Exportar</a>
+                    <a class="nav-link" href="../controllers/export.php"><i class="fas fa-file-export"></i> Exportar</a>
                 </li>
                 <?php if (isset($user['is_admin']) && $user['is_admin']) { ?>
                 <li class="nav-item dropdown">
