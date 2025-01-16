@@ -1,10 +1,10 @@
 <?php
     session_start();
     if(!isset($_SESSION['user_id'])){
-        header("Location: index.php");
+        header("Location: ./index.php");
         exit();
     }
-    require 'db.php';
+    require '../config/db.php';
     if(isset($_GET['id']) && is_numeric($_GET['id'])){
         $id = $_GET['id'];
         $sql = "DELETE FROM forms WHERE id = ?";
