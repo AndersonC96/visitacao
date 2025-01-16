@@ -1,7 +1,7 @@
 <?php
     session_start();
     if (!isset($_SESSION['user_id'])) {
-        header("Location: index.php");
+        header("Location: ./index.php");
         exit();
     }
     include '../config/db.php';
@@ -117,7 +117,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="remove_form.php?id=<?= $row['id'] ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este cadastro?')">
+                                    <a href="../models/remove_form.php?id=<?= $row['id'] ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este cadastro?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
