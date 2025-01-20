@@ -60,7 +60,7 @@
     include '../views/templates/navbar.php';
 ?>
 <div class="container mt-4">
-    <h2 class="text-center">Cadastros Realizados</h2>
+    <h2 class="text-center">Formulários cadastrados</h2>
     <form method="get" class="d-flex justify-content-center mb-3">
         <input
             type="text"
