@@ -34,7 +34,7 @@
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link logout-button" href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                    <a class="nav-link logout-button" href="../logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </li>
             </ul>
         </div>
