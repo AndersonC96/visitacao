@@ -101,6 +101,7 @@
                     <th>Profissão</th>
                     <th>Ciclo</th>
                     <th>Descrição</th>
+                    <th>T. Visita</th>
                     <th>Endereço</th>
                     <th>Cidade</th>
                     <th>Estado</th>
@@ -117,6 +118,7 @@
                         <td class="align-middle text-center"><?php echo htmlspecialchars($form['profissao']); ?></td>
                         <td class="align-middle text-center"><?php echo htmlspecialchars($form['ciclo']); ?></td>
                         <td class="align-middle"><?php echo htmlspecialchars($form['observacao']); ?></td>
+                        <td class="align-middle text-center"><?php echo htmlspecialchars($form['visita']); ?></td>
                         <td class="align-middle text-center"><?php echo htmlspecialchars($form['endereco']); ?></td>
                         <td class="align-middle text-center"><?php echo htmlspecialchars($form['cidade']); ?></td>
                         <td class="align-middle text-center"><?php echo htmlspecialchars($form['estado']); ?></td>
