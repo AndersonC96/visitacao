@@ -14,30 +14,37 @@
     if ($user = $result->fetch_assoc()) {
         $_SESSION['user_type'] = $user['is_admin'] ? 'admin' : 'user';
     }
-    // Obter termo de busca
+    // Definir data padrão (01/01/2025)
+    $default_start_date = '2025-01-01';
+    // Obter termo de busca e data inicial
     $search_representante = $_GET['search_representante'] ?? '';
+    $start_date = $_GET['start_date'] ?? $default_start_date; // Usa a data padrão se nenhuma for fornecida
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $results_per_page = 10;
     $offset = ($page - 1) * $results_per_page;
+    // Se o usuário não inserir uma data menor, manter a data padrão
+    if ($start_date < $default_start_date) {
+        $start_date = $default_start_date;
+    }
     if ($_SESSION['user_type'] == 'admin') {
-        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE representante LIKE ?";
-        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE representante LIKE ? ORDER BY data_hora DESC LIMIT ?, ?";
+        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE representante LIKE ? AND data_hora >= ?";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE representante LIKE ? AND data_hora >= ? ORDER BY data_hora DESC LIMIT ?, ?";
         $stmt = $conn->prepare($forms_sql);
         $search_term = '%' . $search_representante . '%';
-        $stmt->bind_param("sii", $search_term, $offset, $results_per_page);
+        $stmt->bind_param("ssii", $search_term, $start_date, $offset, $results_per_page);
     } else {
-        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ? AND representante LIKE ?";
-        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? AND representante LIKE ? ORDER BY data_hora DESC LIMIT ?, ?";
+        $total_sql = "SELECT COUNT(*) AS total FROM forms WHERE id_usr = ? AND representante LIKE ? AND data_hora >= ?";
+        $forms_sql = "SELECT id, nome, numero_registro, nome_conselho, profissao, endereco, cidade, estado, visita, data_hora, ciclo, observacao, representante FROM forms WHERE id_usr = ? AND representante LIKE ? AND data_hora >= ? ORDER BY data_hora DESC LIMIT ?, ?";
         $stmt = $conn->prepare($forms_sql);
         $search_term = '%' . $search_representante . '%';
-        $stmt->bind_param("isii", $user_id, $search_term, $offset, $results_per_page);
+        $stmt->bind_param("issii", $user_id, $search_term, $start_date, $offset, $results_per_page);
     }
     // Total de registros
     $total_stmt = $conn->prepare($total_sql);
     if ($_SESSION['user_type'] == 'admin') {
-        $total_stmt->bind_param("s", $search_term);
+        $total_stmt->bind_param("ss", $search_term, $start_date);
     } else {
-        $total_stmt->bind_param("is", $user_id, $search_term);
+        $total_stmt->bind_param("iss", $user_id, $search_term, $start_date);
     }
     $total_stmt->execute();
     $total_result = $total_stmt->get_result();
@@ -62,6 +69,12 @@
             placeholder="Buscar por Representante"
             value="<?= htmlspecialchars($search_representante) ?>"
         >
+        <!--<input
+            type="date"
+            name="start_date"
+            class="form-control w-25 me-2"
+            value="<?= htmlspecialchars($start_date) ?>"
+        >-->
         <button type="submit" class="btn btn-primary">Buscar</button>
     </form>
     <div class="table-responsive">
