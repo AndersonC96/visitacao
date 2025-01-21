@@ -1,40 +1,68 @@
 <?php
-    session_start();
-    if(!isset($_SESSION['user_id'])){
-        header("Location: ./index.php");
-        exit();
-    }
-    include '../config/db.php';
-    date_default_timezone_set('America/Sao_Paulo');
-    $user_id = $_SESSION['user_id'];
-    $sql = "SELECT nome, sobrenome FROM users WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if($result->num_rows > 0){
-        $user = $result->fetch_assoc();
-        $nome_do_usuario = $user['nome'];
-        $sobrenome_do_usuario = $user['sobrenome'];
-    }else{
-        header("Location: ./index.php");
-        exit();
-    }
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ./index.php");
+    exit();
+}
+
+include '../config/db.php';
+date_default_timezone_set('America/Sao_Paulo');
+
+$user_id = $_SESSION['user_id'];
+$sql = "SELECT nome, sobrenome FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+    $nome_do_usuario = $user['nome'];
+    $sobrenome_do_usuario = $user['sobrenome'];
+} else {
+    header("Location: ./index.php");
+    exit();
+}
+
+$title = "Formulário"; // Define o título da página
+include '../views/templates/header.php'; // Inclui o cabeçalho
+include '../views/templates/navbar.php'; // Inclui a Navbar
 ?>
-<?php
-    $title = "Formulário"; // Define o título da página
-    include '../views/templates/header.php'; // Inclui o cabeçalho
-    include '../views/templates/navbar.php'; // Inclui a Navbar
-?>
+
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8 col-sm-12">
             <div class="card shadow-lg">
                 <div class="card-header bg-success text-white">
-                    <h2 class="text-center">Preencha o Formulário</h2>
+                    <h2 class="text-center"><i class="fas fa-file-alt"></i> Preencha o Formulário</h2>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="process_form.php">
+                    <!-- Toast de Sucesso -->
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="toastSuccess" class="toast bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="me-auto">Sucesso</strong>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Formulário enviado com sucesso!
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Toast de Erro -->
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="toastError" class="toast bg-danger text-white" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="me-auto">Erro</strong>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Ocorreu um erro ao enviar o formulário. Tente novamente.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Formulário -->
+                    <form method="post" action="process_form.php" id="formulario">
                         <!-- Nome -->
                         <div class="mb-3">
                             <label for="nome" class="form-label"><b>Nome</b></label>
@@ -161,46 +189,16 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 <script>
-    $(document).ready(function(){
-        $('#telefone').mask('(00) 0000-0000');
-        $('#celular').mask('(00) 00000-0000');
-        $('#nome').on('blur', function(){
-            var nome = $(this).val();
-            if(nome){
-                $.ajax({
-                    url: 'get_user_info.php',
-                    type: 'GET',
-                    data: { nome: nome },
-                    success: function(data){
-                        var userInfo = JSON.parse(data);
-                        if(userInfo){
-                            $('#numero_registro').val(userInfo.numero_registro);
-                            $('#nome_conselho').val(userInfo.nome_conselho);
-                            $('#profissao').val(userInfo.profissao);
-                            $('#endereco').val(userInfo.endereco);
-                            $('#cidade').val(userInfo.cidade);
-                            $('#estado').val(userInfo.estado);
-                        }
-                    }
-                });
-            }
-        });
-        function getQueryParams(){
-            var params = {};
-            window.location.search.substring(1).split("&").forEach(function(pair){
-                pair = pair.split("=");
-                params[pair[0]] = decodeURIComponent(pair[1] || "");
-            });
-            return params;
+    $(document).ready(function () {
+        // Exibir toast de sucesso ou erro com base na URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("success") === "true") {
+            const toast = new bootstrap.Toast(document.getElementById("toastSuccess"));
+            toast.show();
+        } else if (params.get("success") === "false") {
+            const toast = new bootstrap.Toast(document.getElementById("toastError"));
+            toast.show();
         }
-        $(document).ready(function(){
-            var params = getQueryParams();
-            if(params.success === "true"){
-                alert("Formulário enviado com sucesso!");
-            }else if(params.success === "false"){
-                alert("Ocorreu um erro ao enviar o formulário: " + params.error);
-            }
-        });
     });
 </script>
-<?php include '../views/templates/footer.php'; // Inclui o rodapé ?>
+<?php include '../views/templates/footer.php'; ?>
