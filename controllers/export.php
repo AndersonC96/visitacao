@@ -10,21 +10,7 @@
     require '../vendor/autoload.php';
     use PhpOffice\PhpSpreadsheet\Spreadsheet;
     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-    use PhpOffice\PhpSpreadsheet\Chart\Chart;
-    use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
-    use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
-    use PhpOffice\PhpSpreadsheet\Chart\Legend;
-    use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
-    use PhpOffice\PhpSpreadsheet\Chart\Title;
-    use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet as PhpSpreadsheetWorksheet;
-    function formatPhoneNumber($phoneNumber) {
-        $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
-        if (strlen($phoneNumber) == 10) {
-            return preg_replace('/^(\d{2})(\d{4})(\d{4})$/', '($1) $2-$3', $phoneNumber);
-        } else {
-            return preg_replace('/^(\d{2})(\d{5})(\d{4})$/', '($1) $2-$3', $phoneNumber);
-        }
-    }
+    // Função para validar e formatar campos de data/hora
     function formatDateTime($dateTime) {
         return date('d/m/Y H:i', strtotime($dateTime));
     }
@@ -43,8 +29,13 @@
             $sql .= ($is_admin == 0 ? " AND" : " WHERE") . " data_hora <= '$data_fim 23:59:59'";
         }
         $result = mysqli_query($conn, $sql);
+        if (!$result || mysqli_num_rows($result) == 0) {
+            header("Location: export.php?success=false&error=NoData");
+            exit();
+        }
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        // Cabeçalhos
         $sheet->setCellValue('A1', 'Nome');
         $sheet->setCellValue('B1', 'Número de Registro');
         $sheet->setCellValue('C1', 'Conselho');
@@ -57,35 +48,15 @@
         $sheet->setCellValue('J1', 'Observações');
         $sheet->setCellValue('K1', 'Data e Hora');
         $sheet->setCellValue('L1', 'Nome do Representante');
-        $spreadsheet->getActiveSheet()->getStyle('A1:L1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 12,
-                'name' => 'Arial',
-                'color' => [
-                    'rgb' => 'FFFFFF',
-                ],
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
-                    'rgb' => '0000FF',
-                ],
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
+        $sheet->getStyle('A1:L1')->applyFromArray([
+            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '0000FF']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ]);
         $row = 2;
         while ($row_data = mysqli_fetch_assoc($result)) {
             $sheet->setCellValue('A' . $row, $row_data['nome']);
+            //$sheet->setCellValue('B' . $row, $row_data['numero_registro']);
             $sheet->setCellValueExplicit('B' . $row, $row_data['numero_registro'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('C' . $row, $row_data['nome_conselho']);
             $sheet->setCellValue('D' . $row, $row_data['profissao']);
@@ -97,17 +68,6 @@
             $sheet->setCellValue('J' . $row, $row_data['observacao']);
             $sheet->setCellValue('K' . $row, formatDateTime($row_data['data_hora']));
             $sheet->setCellValue('L' . $row, $row_data['representante']);
-            $spreadsheet->getActiveSheet()->getStyle('A' . $row . ':L' . $row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-            $spreadsheet->getActiveSheet()->getStyle('A' . $row . ':L' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $spreadsheet->getActiveSheet()->getStyle('A' . $row . ':L' . $row)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-            $spreadsheet->getActiveSheet()->getStyle('A' . $row . ':L' . $row)->applyFromArray([
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => [
-                        'rgb' => 'F0F0F0',
-                    ],
-                ],
-            ]);
             $row++;
         }
         $filename = 'dados_' . date('d-m-Y_H-i-s') . '.xlsx';
@@ -118,42 +78,74 @@
         $writer->save('php://output');
         exit();
     }
-?>
-<?php
-    $title = "Exportar dados"; // Define o título da página
-    include '../views/templates/header.php'; // Inclui o cabeçalho
-    include '../views/templates/navbar.php'; // Inclui a Navbar
+    $title = "Exportar Dados";
+    include '../views/templates/header.php';
+    include '../views/templates/navbar.php';
 ?>
 <div class="container mt-5">
+    <!-- Feedback Visual -->
+    <?php if (isset($_GET['success']) && $_GET['success'] == 'false'): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Erro!</strong> Nenhum dado encontrado para exportação.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
     <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8">
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3 class="mb-0">Exportar dados para Excel</h3>
+                    <h3 class="mb-0"><i class="fas fa-file-export"></i> Exportar Dados</h3>
                 </div>
                 <div class="card-body">
                     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="data_inicio" class="form-label"><b>Data de Início</b></label>
-                                <input type="date" class="form-control" id="data_inicio" name="data_inicio">
+                                <label for="data_inicio" class="form-label">Data de Início</label>
+                                <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="data_fim" class="form-label"><b>Data de Término</b></label>
-                                <input type="date" class="form-control" id="data_fim" name="data_fim">
+                                <label for="data_fim" class="form-label">Data de Término</label>
+                                <input type="date" class="form-control" id="data_fim" name="data_fim" required>
                             </div>
                         </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-file-export me-2"></i>Exportar
-                            </button>
-                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-download me-2"></i> Exportar para Excel
+                        </button>
                     </form>
+                    <!-- Barra de Carregamento -->
+                    <div id="loading" class="d-none mt-3">
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%; height: 25px;">Processando, por favor, aguarde...</div>
+                        </div>
+                    </div>
+                    <!-- Mensagem de Sucesso -->
+                    <div id="success-message" class="alert alert-success d-none mt-3" role="alert">
+                        <strong>Sucesso!</strong> O arquivo foi gerado e está pronto para download.
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-<?php include '../views/templates/footer.php'; // Inclui o rodapé ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const loadingDiv = document.getElementById('loading');
+        const successMessage = document.getElementById('success-message');
+        form.addEventListener('submit', function () {
+            // Exibe a barra de carregamento
+            loadingDiv.classList.remove('d-none');
+            successMessage.classList.add('d-none'); // Oculta a mensagem de sucesso
+            // Desabilita o botão de envio para evitar múltiplos cliques
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            // Simula o tempo de geração do arquivo antes de mostrar a mensagem
+            setTimeout(() => {
+                loadingDiv.classList.add('d-none'); // Remove a barra de carregamento
+                successMessage.classList.remove('d-none'); // Exibe a mensagem de sucesso
+                submitButton.disabled = false; // Reabilita o botão
+            }, 3000); // Tempo estimado (ajuste conforme necessário)
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<?php include '../views/templates/footer.php'; ?>
