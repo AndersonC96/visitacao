@@ -101,6 +101,13 @@ php -S localhost:8000 -t public/
 http://localhost:8000
 ```
 
+## 👨‍💻 Desenvolvimento
+
+### Convenções de Código
+
+- Padrão PSR-12 para organização e formatação do código PHP.
+- Nomes de variáveis e funções seguem o padrão camelCase.
+
 ## Requisitos
 
 - Servidor web com suporte ao PHP (versão 7.4 ou superior recomendada).
