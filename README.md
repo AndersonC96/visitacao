@@ -4,33 +4,33 @@ Gerencie visitas de representantes e clientes de forma eficiente com o sistema d
 
 ## 📋 Funcionalidades
 
-1. **Gerenciamento de Usuários**
+### 1. **Gerenciamento de Usuários**
 - Criação, edição e remoção de usuários.
 - Visualização de usuários cadastrados com permissões administrativas.
 
-2. **Controle de Visitas**
+### 2. **Controle de Visitas**
 - Cadastro detalhado de visitas com informações personalizadas.
 - Filtragem de visitas por data ou representante.
 
-3. **Exportação de Dados**
+### 3. **Exportação de Dados**
 - Geração de relatórios em formato Excel com filtros personalizados.
 
-4. **Interface Responsiva**
+### 4. **Interface Responsiva**
 - Design adaptado para dispositivos móveis e desktops.
 
 ## 🛠️ Tecnologias Utilizadas
 
-1. **Frontend**
+### 1. **Frontend**
 - HTML5, CSS3, JavaScript
 - Bootstrap 5
 
-2. **Backend**
+### 2. **Backend**
 - PHP 8+ com PSR-12
 
-3. **Banco de Dados**
+### 3. **Banco de Dados**
 - MySQL
 
-4. **Bibliotecas/Dependências**
+### 4. **Bibliotecas/Dependências**
 - PhpSpreadsheet para geração de relatórios Excel
 - Composer para gerenciar dependências
 
