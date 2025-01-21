@@ -108,27 +108,30 @@ http://localhost:8000
 - Padrão PSR-12 para organização e formatação do código PHP.
 - Nomes de variáveis e funções seguem o padrão camelCase.
 
-## Requisitos
+## 📈 Melhorias Planejadas
 
-- Servidor web com suporte ao PHP (versão 7.4 ou superior recomendada).
-- MySQL (versão 5.7 ou superior recomendada).
-- Composer para a instalação de dependências PHP.
+- Implementação de autenticação via JWT.
+- Adicionar testes automatizados com PHPUnit.
+- Criar uma API REST para integração com outros sistemas.
+- Melhorar o design e adicionar suporte para temas.
 
 ## Instalação
 
-1. Clone o repositório do projeto para o seu servidor local ou de hospedagem.
-    git clone https://github.com/AndersonC96/Formulario-de-Cadastro.git
+### 1. Clone o repositório do projeto para o seu servidor local ou de hospedagem.
 
-2. Navegue até o diretório do projeto e instale as dependências PHP com o Composer.
-    cd projeto-formularios
-    composer install
+```bash
+git clone https://github.com/AndersonC96/visitacao.git
+```
 
-3. Crie um banco de dados MySQL e importe o esquema localizado em `Database/db.sql`.
+### 2. Navegue até o diretório do projeto e instale as dependências PHP com o Composer.
 
-4. Configure a conexão com o banco de dados editando o arquivo `db.php` com as suas credenciais de banco de dados.
+```bash
+cd projeto-formularios
+composer install
+```
 
-5. Acesse o projeto através do navegador utilizando o endereço do seu servidor.
+### 3. Crie um banco de dados MySQL e importe o esquema localizado em `Database/db.sql`.
 
-## Uso
+### 4. Configure a conexão com o banco de dados editando o arquivo `db.php` com as suas credenciais de banco de dados.
 
-Após a instalação, acesse a tela de login e entre com suas credenciais. Navegue pelas diversas páginas para gerenciar formulários e usuários. Use as funções administrativas para uma gestão avançada do sistema.
+### 5. Acesse o projeto através do navegador utilizando o endereço do seu servidor.
