@@ -61,7 +61,7 @@ visitacao/
 
 ### 2. **Instalação**
 
-#### 1. **Clone o repositório**
+#### 2.1. **Clone o repositório**
 
 ```bash
 git clone https://github.com/AndersonC96/visitacao.git
@@ -74,7 +74,18 @@ cd visitacao
 composer install
 ```
 
+#### 2.3. **Configure o arquivo de banco de dados**
 
+- Renomeie o arquivo `config/db.example.php` para `config/db.php`.
+- Insira suas credenciais de banco de dados no arquivo.
+
+#### 2.4. **Importe o banco de dados**
+
+- Encontre o arquivo database.sql (caso disponível) e importe no seu MySQL:
+
+```bash
+mysql -u root -p < database.sql
+```
 
 ## Requisitos
 
