@@ -1,4 +1,5 @@
         </main>
+        <br>
         <footer class="bg-dark text-light text-center py-3 mt-auto">
             <p>&copy; <?php echo date('Y'); ?> Simple Pharma. Todos os direitos reservados.</p>
             <div>
