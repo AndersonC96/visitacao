@@ -61,7 +61,7 @@ visitacao/
 
 2. **Instalação**
 
-2.1. **Clone o repositório:**
+1. **Clone o repositório:**
 
 ```bash
 git clone https://github.com/AndersonC96/visitacao.git
