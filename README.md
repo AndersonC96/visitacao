@@ -87,6 +87,20 @@ composer install
 mysql -u root -p < database.sql
 ```
 
+### 3. **3. Como Executar**
+
+- Inicie o servidor local
+
+```bash
+php -S localhost:8000 -t public/
+```
+
+- Acesse no navegador
+
+```bash
+http://localhost:8000
+```
+
 ## Requisitos
 
 - Servidor web com suporte ao PHP (versão 7.4 ou superior recomendada).
