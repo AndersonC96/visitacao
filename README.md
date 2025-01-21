@@ -1,16 +1,22 @@
 # Formulario de Cadastro
 
-O Projeto de Criação de Formulários é uma aplicação web desenvolvida com PHP, MySQL, Bootstrap e Composer. A aplicação permite aos usuários criar, visualizar, editar e remover formulários de forma intuitiva e eficiente. Com uma interface amigável e recursos de gestão de usuários, incluindo funções administrativas, o sistema oferece uma solução completa para o gerenciamento de formulários.
+Gerencie visitas de representantes e clientes de forma eficiente com o sistema de visitação. Este projeto permite o cadastro de usuários, controle de visitas e exportação de relatórios detalhados.
 
-## Funcionalidades
+## 📋 Funcionalidades
 
-- **Tela de Login:** Acesso seguro ao sistema através de autenticação de usuário.
-- **Página Home:** Visão geral e acesso rápido às principais funcionalidades do sistema.
-- **Criação de Formulários:** Interface para a criação de novos formulários com campos personalizáveis.
-- **Visualização de Formulários:** Lista todos os formulários criados com opções para visualização, edição e remoção.
-- **Exportação de Formulários:** Permite aos usuários exportar os dados dos formulários cadastrados.
-- **Gestão de Usuários:** Criação e visualização de usuários, com opções de edição e remoção. Recursos de administração disponíveis apenas para usuários com nível administrador.
-- **Logout:** Opção para sair do sistema de forma segura.
+1. Gerenciamento de Usuários
+- **Criação, edição e remoção de usuários.
+- **Visualização de usuários cadastrados com permissões administrativas.
+
+2. Controle de Visitas
+- **Cadastro detalhado de visitas com informações personalizadas.
+- **Filtragem de visitas por data ou representante.
+
+3. Exportação de Dados
+- **Geração de relatórios em formato Excel com filtros personalizados.
+
+4. Interface Responsiva
+- **Design adaptado para dispositivos móveis e desktops.
 
 ## Tecnologias Utilizadas
 
