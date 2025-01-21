@@ -28,7 +28,6 @@ $title = "Formulário"; // Define o título da página
 include '../views/templates/header.php'; // Inclui o cabeçalho
 include '../views/templates/navbar.php'; // Inclui a Navbar
 ?>
-
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8 col-sm-12">
@@ -174,6 +173,8 @@ include '../views/templates/navbar.php'; // Inclui a Navbar
                             <label for="observacao" class="form-label"><b>Observações</b></label>
                             <textarea class="form-control" id="observacao" name="observacao" rows="3" placeholder="Digite qualquer observação relevante"></textarea>
                         </div>
+                        <input type="hidden" id="user_id" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+                        <input type="hidden" id="representante" name="representante" value="<?php echo htmlspecialchars($nome_do_usuario) . ' ' . htmlspecialchars($sobrenome_do_usuario); ?>">
                         <!-- Botão de Envio -->
                         <button type="submit" class="btn btn-success btn-lg w-100">
                             <i class="fas fa-paper-plane"></i> Enviar
