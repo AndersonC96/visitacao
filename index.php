@@ -80,7 +80,8 @@
                     <div class="alert"><?php echo $error; ?></div>
                 <?php } ?>
                 <div class="buttons">
-                    <a href="#" class="forgot-link" style="text-decoration: none;">Esqueceu sua senha?</a>
+                    <!--<a href="#" class="forgot-link" style="text-decoration: none;">Esqueceu sua senha?</a>-->
+                    <a href="#" class="forgot-link" style="text-decoration: none;"></a>
                     <button type="submit" class="login-button">Entrar</button>
                 </div>
             </form>
