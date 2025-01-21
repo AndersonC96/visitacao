@@ -17,7 +17,7 @@
             $stmt->bind_param("ssssi", $nome, $sobrenome, $username, $password, $admin);
             $stmt->execute();
             if($stmt->affected_rows > 0){
-                header("Location: ../public/dashboard.php?success=true");
+                header("Location: view_users.php?success=true");
                 exit();
             }else{
                 echo "Erro ao adicionar o usuário: " . $conn->error;
