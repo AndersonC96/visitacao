@@ -53,15 +53,15 @@ visitacao/
 
 ## 🚀 Como Usar
 
-1. **Pré-requisitos**
+### 1. **Pré-requisitos**
 
 - PHP 7+
 - MySQL
 - Composer
 
-2. **Instalação**
+### 2. **Instalação**
 
-### 2.1. **Clone o repositório:**
+#### 2.1. Clone o repositório:
 
 ```bash
 git clone https://github.com/AndersonC96/visitacao.git
@@ -70,8 +70,9 @@ cd visitacao
 
 2.2. Instale as dependências:
 
-bash
+```bash
 composer install
+```
 
 ## Requisitos
 
