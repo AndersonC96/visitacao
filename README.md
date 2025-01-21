@@ -61,18 +61,20 @@ visitacao/
 
 ### 2. **Instalação**
 
-#### 2.1. Clone o repositório:
+#### 1. **Clone o repositório**
 
 ```bash
 git clone https://github.com/AndersonC96/visitacao.git
 cd visitacao
 ```
 
-2.2. Instale as dependências:
+#### 2.2. **Instale as dependências**
 
 ```bash
 composer install
 ```
+
+
 
 ## Requisitos
 
